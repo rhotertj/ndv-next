@@ -1,10 +1,13 @@
-export function Filter() {
+export function Filter({category} : {category: string}) {
     return (
         <div className="mx-5">
-            <select className="w-24" name="Filter A" id="filterid">
-                <option value="k1">Kreisliga 1</option>
-                <option value="k2">Kreisliga 2</option>
-                <option value="k3">Kreisliga 3</option>
+            <div className="label">
+                <span className="label-text">{category}</span>
+            </div>
+            <select defaultValue="Alle" className="select select-bordered w-full max-w-xs select-sm rounded-lg">
+                <option value="placeholder">Alle</option>
+                <option value="placeholder">Han Solo</option>
+                <option value="placeholder">Greedo</option>
             </select>
         </div>
     )

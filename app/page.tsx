@@ -1,7 +1,10 @@
-import Image from "next/image";
+import { Footer } from "./ui/footer";
 import {PlayerListEntry, PlayerType} from "./ui/player";
 import { Filter } from "./ui/filter";
+import { GeneralStats } from "./ui/stats";
 import './index.css'
+import {MetaData, fetchMetaData} from "./lib/dataFetching"
+import { Suspense } from "react";
 
 const fakeplayer : PlayerType = {
   name: "Mämmäd Gulijev",
@@ -12,32 +15,41 @@ const fakeplayer : PlayerType = {
   humanID: "memo485894"
 }
 
-export default function Home() {
-  const data = {players : 781, matches: 8900, competitions: 22}
+export default async function Home() {
   return (
     <main>
-      <div className="mx-auto w-6/12">
-        <h1 className="text-center mt-[150px] text-8xl font-bold antialiased"><span className="italic font-black">NDV</span> Rankings</h1>
-        <div className="flex mx-auto justify-center mb-4">
-          <div className="m-6"><span className="text-2xl">{data.players}</span> Spieler</div>
-          <div className="m-6"><span className="text-2xl">{data.matches}</span> Matches</div>
-          <div className="m-6"><span className="text-2xl">{data.competitions}</span> Wettbewerbe</div>
-        </div>
-        <div className="flex mx-auto justify-center mb-6">Letzter Stand: 12.02.2024</div>
+      <div>
+        <h1 className="flex justify-center mt-[150px] text-4xl lg:text-9xl font-bold antialiased">
+          <span className="italic font-black">NDV</span>Rankings
+        </h1>
       </div>
-      <div className="flex flex-col m-auto mb-6" >
-        <input type="text" className="self-center w-auto mb-6" />
+      <div className="flex flex-col m-auto mb-6 mt-10" >
+        <input type="text" className="input drop-shadow-lg self-center mb-6 text-lg" placeholder="Spielername" />
         <div className="self-center mb-10 flex">
-          <Filter/>
-          <Filter/>
-          <Filter/>
+          <Filter category="Wettbewerb"/>
+          <Filter category="Saison"/>
+          <Filter category="Verein"/>
         </div>
       </div>
-      <div className="mx-auto max-w-screen-sm">
+      {/* overflow-y-scroll max-h-[700px]  scrolling feels buggy*/}
+      <div className="flex flex-col items-center ">
         <PlayerListEntry index={1} player={fakeplayer}/>
         <PlayerListEntry index={2} player={fakeplayer}/>
         <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
+        <PlayerListEntry index={3} player={fakeplayer}/>
       </div>
+      <div className="flex justify-center mb-6 mt-6">
+          <Suspense fallback={<div className="skeleton w-64 h-16"></div>}>
+            <GeneralStats />
+          </Suspense>
+        </div>
+      <Footer />
     </main>
   );
 }
