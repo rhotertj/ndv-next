@@ -1,21 +1,39 @@
+/* trunk-ignore-all(prettier) */
 import { Footer } from "./ui/footer";
-import {PlayerListEntry, PlayerType} from "./ui/player";
+import { PlayerListEntry, conservativeRating } from "./ui/player";
 import { Filter } from "./ui/filter";
+import { Search } from "./ui/search";
 import { GeneralStats } from "./ui/stats";
-import './index.css'
-import {MetaData, fetchMetaData} from "./lib/dataFetching"
+import "./index.css";
 import { Suspense } from "react";
+import {
+  fetchClubFilterOptions,
+  fetchCompetitionFilterOptions,
+  fetchPlayers,
+  fetchSeasonFilterOptions,
+  validatedQueryParams,
+} from "./lib/dataFetching";
 
-const fakeplayer : PlayerType = {
-  name: "Mämmäd Gulijev",
-  ranking: 12.09,
-  ranking_mu: 25.56,
-  ranking_sigma: 3.87,
-  club: "Dart Akademie Hannover e.V.",
-  humanID: "memo485894"
-}
+// https://nextjs.org/learn/dashboard-app/adding-search-and-pagination
 
-export default async function Home() {
+export default async function Home({
+  searchParams,
+}: {
+  searchParams?: {
+    wettbewerb?: string;
+    saison?: number;
+    verein?: string;
+    name?: string;
+  };
+}) {
+  const validatedParams = new validatedQueryParams(searchParams);
+  const competitionOptions =
+    await fetchCompetitionFilterOptions(validatedParams);
+  const seasonOptions = await fetchSeasonFilterOptions(validatedParams);
+  const clubOptions = await fetchClubFilterOptions(validatedParams);
+  let players = await fetchPlayers(validatedParams);
+  console.log("firstplayer", players[0])
+  players.sort((a:any, b:any) => conservativeRating(b) - conservativeRating(a));
   return (
     <main>
       <div>
@@ -23,33 +41,29 @@ export default async function Home() {
           <span className="italic font-black">NDV</span>Rankings
         </h1>
       </div>
-      <div className="flex flex-col m-auto mb-6 mt-10" >
-        <input type="text" className="input drop-shadow-lg self-center mb-6 text-lg" placeholder="Spielername" />
+      <div className="flex flex-col m-auto mb-6 mt-10">
+        <Search category="Name"/>
         <div className="self-center mb-10 flex">
-          <Filter category="Wettbewerb"/>
-          <Filter category="Saison"/>
-          <Filter category="Verein"/>
+          <Filter category="Wettbewerb" options={competitionOptions} />
+          <Filter category="Saison" options={seasonOptions} />
+          <Filter category="Verein" options={clubOptions} />
         </div>
       </div>
-      {/* overflow-y-scroll max-h-[700px]  scrolling feels buggy*/}
-      <div className="flex flex-col items-center ">
-        <PlayerListEntry index={1} player={fakeplayer}/>
-        <PlayerListEntry index={2} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-        <PlayerListEntry index={3} player={fakeplayer}/>
-      </div>
-      <div className="flex justify-center mb-6 mt-6">
-          <Suspense fallback={<div className="skeleton w-64 h-16"></div>}>
-            <GeneralStats />
-          </Suspense>
+      <div className="min-w-fit flex flex-col items-center">
+        <div className=" w-fit max-h-[80vh] overflow-hidden hover:overflow-y-scroll">
+          {players.map((player, index, _) => (
+            <PlayerListEntry index={index} key={player.id} player={player} />
+          ))}
         </div>
-      <Footer />
+      </div>
+      <div className="flex justify-center mb-6 mt-10">
+        <Suspense fallback={<div className="skeleton w-64 h-16"></div>}>
+          <GeneralStats />
+        </Suspense>
+      </div>
+      <div className="mb-8">
+        <Footer />
+      </div>
     </main>
   );
 }

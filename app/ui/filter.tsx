@@ -1,14 +1,48 @@
-export function Filter({category} : {category: string}) {
-    return (
-        <div className="mx-5">
-            <div className="label">
-                <span className="label-text">{category}</span>
-            </div>
-            <select defaultValue="Alle" className="select select-bordered w-full max-w-xs select-sm rounded-lg">
-                <option value="placeholder">Alle</option>
-                <option value="placeholder">Han Solo</option>
-                <option value="placeholder">Greedo</option>
-            </select>
-        </div>
-    )
+"use client";
+
+import { useSearchParams, usePathname, useRouter } from "next/navigation";
+
+export async function Filter({
+  category,
+  options,
+}: {
+  category: string;
+  options: any;
+}) {
+  const searchParamsParser: any = useSearchParams();
+  const currentSearchParams = new URLSearchParams(searchParamsParser);
+
+  const pathname = usePathname();
+  const { replace } = useRouter();
+
+  function updateParams(category: string, value: any, params: any) {
+    if (value != "Alle") {
+      params.set(category, value);
+    } else {
+      params.delete(category);
+    }
+    replace(`${pathname}?${params.toString()}`);
+  }
+
+  return (
+    <div className="mx-5">
+      <div className="label">
+        <span className="label-text">{category}</span>
+      </div>
+      <select
+        onInput={(e: any) => {
+          updateParams(category, e.target.value, currentSearchParams);
+        }}
+        defaultValue={currentSearchParams?.get(category)?.toString()}
+        className="select select-bordered w-full max-w-xs select-sm rounded-lg"
+      >
+        <option value={undefined}>Alle</option>
+        {options.map(({ id, name }: { id: number; name: string }) => (
+          <option key={name} value={name}>
+            {name}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
 }
