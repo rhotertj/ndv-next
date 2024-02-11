@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import "@/app/globals.css";
+import '@/app/globals.css'
 
 const montserrat = Montserrat({subsets: ['latin']});
 
@@ -8,8 +8,8 @@ export const metadata: Metadata = {
   title: "NDV Rankings",
   description: "Rankings für alle Dartspieler in Niedersachsen.",
 };
-
-export default function RootLayout({
+// Think about nested routing that replaces the player list with a detailed component
+export default function PlayerLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

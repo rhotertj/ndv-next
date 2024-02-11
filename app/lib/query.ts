@@ -1,29 +1,4 @@
 import prisma from "./database";
-// we need to query with filter states as arguments, requery when states change (done in respective components)
-// use for suspense testing
-function Sleep(milliseconds: number) {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
-}
-
-export type metaDataType = {
-  players: number;
-  matches: number;
-  competitions: number;
-};
-
-export async function fetchMetaData() {
-  const nPlayers = await prisma.player_table.count();
-  const nSingles = await prisma.singlesmatch_table.count();
-  const nDoubles = await prisma.doublesmatch_table.count();
-  const nCompetitions = await prisma.competition_table.count();
-  await Promise.all([nPlayers, nDoubles, nSingles, nCompetitions]);
-  const data = {
-    players: nPlayers,
-    matches: nSingles + nDoubles,
-    competitions: nCompetitions,
-  };
-  return data;
-}
 
 export class validatedQueryParams {
   _competition: string;
@@ -61,7 +36,7 @@ export class validatedQueryParams {
 
   get season() {
     if (this._season === null) {
-      return false;
+      return undefined;
     }
     return this._season;
   }
@@ -71,26 +46,65 @@ export class validatedQueryParams {
 export async function fetchCompetitionFilterOptions(
   params: validatedQueryParams,
 ) {
-  let whereCondition: any = {};
-  if (params.season !== undefined) {
-    whereCondition["year"] = {
-      equals: "2023-08-01T00:00:00.000Z",
-    };
-  }
-  // console.log(new Date())
-
-  // competitions are dependent on the season and the club
-  // console.log("condition Wettbewerb", whereCondition, params.season)
   const competitions = await prisma.competition_table.findMany({
     select: { name: true },
-    where: whereCondition || true,
+    where: {
+      teammatch_table: {
+        some: {
+          OR: [
+            {
+              team_table_teammatch_table_away_teamToteam_table: {
+                club_table: {
+                  name: params.club
+                }
+              },
+            },
+            {
+              team_table_teammatch_table_home_teamToteam_table: {
+                club_table: {
+                  name: params.club
+                }
+              },
+            }
+          ]
+        }
+      }
+    },
     orderBy: { name: "asc" },
   });
   return competitions;
 }
 
 export async function fetchClubFilterOptions(params: validatedQueryParams) {
-  const clubs = await prisma.club_table.findMany({ orderBy: { name: "asc" } });
+  const clubs = await prisma.club_table.findMany({
+    where: {
+      team_table: {
+        some: {
+          OR: [
+            {
+              teammatch_table_teammatch_table_away_teamToteam_table: {
+                some: {
+                  competition_table: {
+                    name:  params.competition
+                  }
+                }
+              },
+            },
+            {
+              teammatch_table_teammatch_table_home_teamToteam_table: {
+                some: {
+                  competition_table: {
+                    name:  params.competition
+                  }
+                }
+              },
+            }
+          ]
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
   return clubs;
 }
 

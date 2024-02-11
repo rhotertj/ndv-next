@@ -37,7 +37,7 @@ export function PlayerListEntry({
   const rating_sigma: string =
     player.player_table[0].skillrating_table[0]?.rating_sigma.toFixed(2) || '8.33';
   return (
-    <Link key={player.id} href={`/players/${player.id}`}>
+    <Link key={player.id} href={`/players/${player.id}`} target="_blank">
       <div className="flex player-container border border-solid rounded-md mb-1 min-w-fit lg:min-w-[650px] max-w-screen-lg">
         <div className="player-indicator w-2"></div>
         <div className="flex-col self-center my-2 mx-4">{index + 1}.</div>

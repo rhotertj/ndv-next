@@ -4,7 +4,6 @@ import { PlayerListEntry, conservativeRating } from "./ui/player";
 import { Filter } from "./ui/filter";
 import { Search } from "./ui/search";
 import { GeneralStats } from "./ui/stats";
-import "./index.css";
 import { Suspense } from "react";
 import {
   fetchClubFilterOptions,
@@ -12,9 +11,8 @@ import {
   fetchPlayers,
   fetchSeasonFilterOptions,
   validatedQueryParams,
-} from "./lib/dataFetching";
-
-// https://nextjs.org/learn/dashboard-app/adding-search-and-pagination
+} from "./lib/query";
+import "./index.css";
 
 export default async function Home({
   searchParams,
@@ -32,7 +30,7 @@ export default async function Home({
   const seasonOptions = await fetchSeasonFilterOptions(validatedParams);
   const clubOptions = await fetchClubFilterOptions(validatedParams);
   let players = await fetchPlayers(validatedParams);
-  console.log("firstplayer", players[0])
+
   players.sort((a:any, b:any) => conservativeRating(b) - conservativeRating(a));
   return (
     <main>
@@ -45,11 +43,12 @@ export default async function Home({
         <Search category="Name"/>
         <div className="self-center mb-10 flex">
           <Filter category="Wettbewerb" options={competitionOptions} />
-          <Filter category="Saison" options={seasonOptions} />
+          {/* <Filter category="Saison" options={seasonOptions} /> */}
           <Filter category="Verein" options={clubOptions} />
         </div>
       </div>
       <div className="min-w-fit flex flex-col items-center">
+        {/* Think about making the player list a suspenseable server component */}
         <div className=" w-fit max-h-[80vh] overflow-hidden hover:overflow-y-scroll">
           {players.map((player, index, _) => (
             <PlayerListEntry index={index} key={player.id} player={player} />

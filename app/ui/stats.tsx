@@ -1,4 +1,4 @@
-import { fetchMetaData, metaDataType } from "../lib/dataFetching";
+import { fetchMetaData, metaDataType } from "../lib/metadata";
 
 export async function GeneralStats(){
     const data : metaDataType = await fetchMetaData();
