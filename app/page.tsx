@@ -1,6 +1,6 @@
 /* trunk-ignore-all(prettier) */
 import { Footer } from "./ui/footer";
-import { PlayerListEntry, conservativeRating } from "./ui/player";
+import { PlayerListEntry } from "./ui/player";
 import { Filter } from "./ui/filter";
 import { Search } from "./ui/search";
 import { GeneralStats } from "./ui/stats";
@@ -8,10 +8,11 @@ import { Suspense } from "react";
 import {
   fetchClubFilterOptions,
   fetchCompetitionFilterOptions,
-  fetchPlayers,
+  fetchPlayerRatingsList,
   fetchSeasonFilterOptions,
   validatedQueryParams,
 } from "./lib/query";
+import { PlayerRating } from "./lib/player";
 import "./index.css";
 
 export default async function Home({
@@ -28,10 +29,12 @@ export default async function Home({
   const competitionOptions =
     await fetchCompetitionFilterOptions(validatedParams);
   const seasonOptions = await fetchSeasonFilterOptions(validatedParams);
+  console.log(seasonOptions)
   const clubOptions = await fetchClubFilterOptions(validatedParams);
-  let players = await fetchPlayers(validatedParams);
+  let players : any = await fetchPlayerRatingsList(validatedParams);
+  players = players.map((player : any) => {return new PlayerRating(player)});
 
-  players.sort((a:any, b:any) => conservativeRating(b) - conservativeRating(a));
+  players.sort((a: PlayerRating, b: PlayerRating) => b.conservativeRating() - a.conservativeRating());
   return (
     <main>
       <div>
@@ -43,15 +46,15 @@ export default async function Home({
         <Search category="Name"/>
         <div className="self-center mb-10 flex">
           <Filter category="Wettbewerb" options={competitionOptions} />
-          {/* <Filter category="Saison" options={seasonOptions} /> */}
+          <Filter category="Saison" options={seasonOptions} />
           <Filter category="Verein" options={clubOptions} />
         </div>
       </div>
       <div className="min-w-fit flex flex-col items-center">
         {/* Think about making the player list a suspenseable server component */}
         <div className=" w-fit max-h-[80vh] overflow-hidden hover:overflow-y-scroll">
-          {players.map((player, index, _) => (
-            <PlayerListEntry index={index} key={player.id} player={player} />
+          {players.map((player: PlayerRating, index: number) => (
+            <PlayerListEntry index={index} key={player.humanID} player={player} />
           ))}
         </div>
       </div>

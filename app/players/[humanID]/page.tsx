@@ -1,3 +1,6 @@
+import { fetchPlayerRatings, PlayerRating, fetchHumanLastSingles, SinglesMatch } from "@/app/lib/player";
+import { RatingCard } from "@/app/ui/player";
+
 export default async function Player({
     params,
   }: {
@@ -6,6 +9,11 @@ export default async function Player({
     };
   }) {
     const humanID = decodeURIComponent(params.humanID)
+    const skillRatingsQuery = await fetchPlayerRatings(humanID);
+    const skillRatings = skillRatingsQuery.map((result) => new PlayerRating(result))
+    const singlesQueryResult = await fetchHumanLastSingles(humanID);
+    console.log(singlesQueryResult)
+    const singles = singlesQueryResult.map((result) => {return new SinglesMatch(result)})
     // fetch all player identities
     // for these player identites, find last games, ratings
     return(
@@ -24,7 +32,8 @@ export default async function Player({
                 </div>
             </div> */}
             <div className="flex flex-col">
-                <p className="text-4xl mb-6">Mämmäd Gulijev</p>
+                {/* DOES NOT WORK IF PLAYER HAS NO SKILL RATING */}
+                <p className="text-4xl mb-6">{skillRatings[0].playerName}</p>
                 {/* badges here */}
             </div>
             
@@ -32,20 +41,13 @@ export default async function Player({
         <div className="flex flex-col">
         <h2 className="text-2xl font-bold">Rankings</h2>
         <div className="flex">
-            <div className="card max-w-fit border-primary border-dotted shadow-xl">
-                <div className="card-body">
-                    <h2 className="card-title text-3xl flex justify-center">34.3</h2>
-                    <p className="mx-4">Kreisliga 5, Dart Akademie Hannover</p>
-                </div>
-            </div>
-            <div className="card max-w-fit border-primary border-dotted shadow-xl">
-                <div className="card-body">
-                    <h2 className="card-title text-3xl flex justify-center">14.3</h2>
-                    <p className="mx-4">Kreisliga 1, Dart Akademie Hannover</p>
-                </div>
-            </div>
+            {skillRatings.map( (rating: PlayerRating) => <RatingCard rating={rating}/> )}
         </div>
-        <h2 className="text-2xl font-bold mt-6">Letzte Spiele</h2>    
+
+        <h2 className="text-2xl font-bold mt-6">Letzte Spiele</h2>
+            <div>
+                {singles.map( (match : SinglesMatch) =>  <div>{match.homePlayer} {match.result} {match.awayPlayer}</div>)}
+            </div>
         </div>
         </div>
        </main>

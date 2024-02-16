@@ -1,19 +1,19 @@
 -- CreateTable
-CREATE TABLE "club_table" (
+CREATE TABLE "Club" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT
 );
 
 -- CreateTable
-CREATE TABLE "competition_table" (
+CREATE TABLE "Competition" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT,
     "association" TEXT,
-    "year" DATETIME
+    "year" TEXT
 );
 
 -- CreateTable
-CREATE TABLE "doublesmatch_table" (
+CREATE TABLE "Doublesmatch" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "team_match" INTEGER,
     "home_player1" INTEGER,
@@ -22,84 +22,89 @@ CREATE TABLE "doublesmatch_table" (
     "away_player2" INTEGER,
     "result" TEXT,
     "match_number" INTEGER,
-    CONSTRAINT "doublesmatch_table_away_player2_fkey" FOREIGN KEY ("away_player2") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "doublesmatch_table_away_player1_fkey" FOREIGN KEY ("away_player1") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "doublesmatch_table_home_player2_fkey" FOREIGN KEY ("home_player2") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "doublesmatch_table_home_player1_fkey" FOREIGN KEY ("home_player1") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "doublesmatch_table_team_match_fkey" FOREIGN KEY ("team_match") REFERENCES "teammatch_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+    CONSTRAINT "Doublesmatch_away_player2_fkey" FOREIGN KEY ("away_player2") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Doublesmatch_away_player1_fkey" FOREIGN KEY ("away_player1") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Doublesmatch_home_player2_fkey" FOREIGN KEY ("home_player2") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Doublesmatch_home_player1_fkey" FOREIGN KEY ("home_player1") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Doublesmatch_team_match_fkey" FOREIGN KEY ("team_match") REFERENCES "Teammatch" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CreateTable
-CREATE TABLE "human_table" (
+CREATE TABLE "Human" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT
 );
 
 -- CreateTable
-CREATE TABLE "player_table" (
+CREATE TABLE "Player" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "human" TEXT,
     "club" INTEGER,
     "association_id" TEXT,
-    CONSTRAINT "player_table_club_fkey" FOREIGN KEY ("club") REFERENCES "club_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "player_table_human_fkey" FOREIGN KEY ("human") REFERENCES "human_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+    "default_competition" INTEGER,
+    CONSTRAINT "Player_default_competition_fkey" FOREIGN KEY ("default_competition") REFERENCES "Competition" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Player_club_fkey" FOREIGN KEY ("club") REFERENCES "Club" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Player_human_fkey" FOREIGN KEY ("human") REFERENCES "Human" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CreateTable
-CREATE TABLE "singlesmatch_table" (
+CREATE TABLE "Singlesmatch" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "team_match" INTEGER,
     "home_player" INTEGER,
     "away_player" INTEGER,
     "result" TEXT,
     "match_number" INTEGER,
-    CONSTRAINT "singlesmatch_table_away_player_fkey" FOREIGN KEY ("away_player") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "singlesmatch_table_home_player_fkey" FOREIGN KEY ("home_player") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "singlesmatch_table_team_match_fkey" FOREIGN KEY ("team_match") REFERENCES "teammatch_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+    CONSTRAINT "Singlesmatch_away_player_fkey" FOREIGN KEY ("away_player") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Singlesmatch_home_player_fkey" FOREIGN KEY ("home_player") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Singlesmatch_team_match_fkey" FOREIGN KEY ("team_match") REFERENCES "Teammatch" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CreateTable
-CREATE TABLE "skillrating_table" (
+CREATE TABLE "Skillrating" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "player" INTEGER,
     "competition" INTEGER,
     "rating_mu" REAL,
     "rating_sigma" REAL,
-    "latest_update" DATETIME,
-    CONSTRAINT "skillrating_table_competition_fkey" FOREIGN KEY ("competition") REFERENCES "competition_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "skillrating_table_player_fkey" FOREIGN KEY ("player") REFERENCES "player_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+    "latest_update" TEXT,
+    CONSTRAINT "Skillrating_competition_fkey" FOREIGN KEY ("competition") REFERENCES "Competition" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Skillrating_player_fkey" FOREIGN KEY ("player") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CreateTable
-CREATE TABLE "team_table" (
+CREATE TABLE "Team" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "rank" TEXT,
     "club" INTEGER,
-    "year" DATETIME,
-    CONSTRAINT "team_table_club_fkey" FOREIGN KEY ("club") REFERENCES "club_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+    "year" TEXT,
+    CONSTRAINT "Team_club_fkey" FOREIGN KEY ("club") REFERENCES "Club" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CreateTable
-CREATE TABLE "teammatch_table" (
+CREATE TABLE "Teammatch" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "date" DATETIME,
+    "date" TEXT,
     "competition" INTEGER,
     "result" TEXT,
     "home_team" INTEGER,
     "away_team" INTEGER,
     "used_for_rating" BOOLEAN,
-    CONSTRAINT "teammatch_table_away_team_fkey" FOREIGN KEY ("away_team") REFERENCES "team_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "teammatch_table_home_team_fkey" FOREIGN KEY ("home_team") REFERENCES "team_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
-    CONSTRAINT "teammatch_table_competition_fkey" FOREIGN KEY ("competition") REFERENCES "competition_table" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
+    CONSTRAINT "Teammatch_away_team_fkey" FOREIGN KEY ("away_team") REFERENCES "Team" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Teammatch_home_team_fkey" FOREIGN KEY ("home_team") REFERENCES "Team" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Teammatch_competition_fkey" FOREIGN KEY ("competition") REFERENCES "Competition" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
 -- CreateIndex
 Pragma writable_schema=1;
-CREATE UNIQUE INDEX "sqlite_autoindex_club_table_1" ON "club_table"("name");
+CREATE UNIQUE INDEX "sqlite_autoindex_Club_1" ON "Club"("name");
 Pragma writable_schema=0;
 
 -- CreateIndex
 Pragma writable_schema=1;
-CREATE UNIQUE INDEX "sqlite_autoindex_player_table_1" ON "player_table"("id");
+CREATE UNIQUE INDEX "sqlite_autoindex_Player_1" ON "Player"("id");
 Pragma writable_schema=0;
+
+-- CreateIndex
+CREATE INDEX "ix_Player_human" ON "Player"("human");
 

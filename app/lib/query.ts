@@ -46,22 +46,22 @@ export class validatedQueryParams {
 export async function fetchCompetitionFilterOptions(
   params: validatedQueryParams,
 ) {
-  const competitions = await prisma.competition_table.findMany({
+  const competitions = await prisma.competition.findMany({
     select: { name: true },
     where: {
-      teammatch_table: {
+      Teammatch: {
         some: {
           OR: [
             {
-              team_table_teammatch_table_away_teamToteam_table: {
-                club_table: {
+              Team_Teammatch_away_teamToTeam: {
+                Club: {
                   name: params.club
                 }
               },
             },
             {
-              team_table_teammatch_table_home_teamToteam_table: {
-                club_table: {
+              Team_Teammatch_home_teamToTeam: {
+                Club: {
                   name: params.club
                 }
               },
@@ -76,24 +76,24 @@ export async function fetchCompetitionFilterOptions(
 }
 
 export async function fetchClubFilterOptions(params: validatedQueryParams) {
-  const clubs = await prisma.club_table.findMany({
+  const clubs = await prisma.club.findMany({
     where: {
-      team_table: {
+      Team: {
         some: {
           OR: [
             {
-              teammatch_table_teammatch_table_away_teamToteam_table: {
+              Teammatch_Teammatch_away_teamToTeam: {
                 some: {
-                  competition_table: {
+                  Competition: {
                     name:  params.competition
                   }
                 }
               },
             },
             {
-              teammatch_table_teammatch_table_home_teamToteam_table: {
+              Teammatch_Teammatch_home_teamToTeam: {
                 some: {
-                  competition_table: {
+                  Competition: {
                     name:  params.competition
                   }
                 }
@@ -109,81 +109,56 @@ export async function fetchClubFilterOptions(params: validatedQueryParams) {
 }
 
 export async function fetchSeasonFilterOptions(params: validatedQueryParams) {
-  // const seasons = await prisma.competition_table.findMany({select: {year : true}});
-  //   return seasons;
+  const seasons = await prisma.competition.findMany({select: {year : true}});
+  return seasons;
   return [
     { id: 0, name: 2022 },
     { id: 1, name: 2023 },
   ];
 }
-export async function fetchPlayers(params: validatedQueryParams) {
-  // need player_id for respective human_id for club_id and skillrating
-  let whereConditionName: any = {};
-  if (params.name !== undefined) {
-    whereConditionName["name"] = { startsWith: params.name };
-  }
-  let whereConditionClub: any = {};
-  if (params.club !== undefined) {
-    whereConditionClub["name"] = { equals: params.club };
-  }
-  console.log(params, whereConditionClub);
-  // Player where playerid is in home or away player in a match that links to a teammatch in a competition we filter
-  const allHumans = await prisma.human_table.findMany({
+
+export async function fetchPlayerRatingsList(params: validatedQueryParams) {
+  const ratings = prisma.skillrating.findMany({
     where: {
-      name: {
-        startsWith: params.name,
+      Player: {
+        Human: {
+          name: {
+            startsWith: params.name
+          }
+        },
+        Club: {
+          name: params.club
+        }
       },
-      player_table: {
-        some: {
-          club_table: {
-            name: params.club,
-          },
-          OR: [
-            {
-              singlesmatch_table_singlesmatch_table_away_playerToplayer_table: {
-                some: {
-                  teammatch_table: {
-                    competition_table: {
-                      name: params.competition,
-                    },
-                  },
-                },
-              },
-            },
-            {
-              singlesmatch_table_singlesmatch_table_home_playerToplayer_table: {
-                some: {
-                  teammatch_table: {
-                    competition_table: {
-                      name: params.competition,
-                    },
-                  },
-                },
-              },
-            },
-          ],
+      Competition: {
+        name: params.competition
+      }
+    },
+    orderBy: {rating_mu: 'desc'},
+    select: {
+      rating_mu: true,
+      rating_sigma: true,
+      Competition: {
+        select: {
+          name: true,
         },
       },
-    },
-    select: {
-      id: true,
-      name: true,
-      player_table: {
+      Player: {
         select: {
-          club_table: {
+          Club: {
             select: {
               name: true,
             },
           },
-          skillrating_table: {
+          Human: {
             select: {
-              rating_mu: true,
-              rating_sigma: true,
+              name: true,
+              id: true
             },
           },
         },
       },
     },
   });
-  return allHumans;
+  return ratings;
 }

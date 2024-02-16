@@ -7,10 +7,10 @@ export type metaDataType = {
   };
   
   export async function fetchMetaData() {
-    const nPlayers = await prisma.player_table.count();
-    const nSingles = await prisma.singlesmatch_table.count();
-    const nDoubles = await prisma.doublesmatch_table.count();
-    const nCompetitions = await prisma.competition_table.count();
+    const nPlayers = await prisma.player.count();
+    const nSingles = await prisma.singlesmatch.count();
+    const nDoubles = await prisma.doublesmatch.count();
+    const nCompetitions = await prisma.competition.count();
     await Promise.all([nPlayers, nDoubles, nSingles, nCompetitions]);
     const data = {
       players: nPlayers,

@@ -1,110 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
 datasource db {
   provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider = "prisma-client-js"
+model Club {
+  id     Int      @id @default(autoincrement())
+  name   String?  @unique(map: "sqlite_autoindex_Club_1")
+  Player Player[]
+  Team   Team[]
 }
 
-model club_table {
-  id           Int            @id @default(autoincrement())
-  name         String?        @unique(map: "sqlite_autoindex_club_table_1")
-  player_table player_table[]
-  team_table   team_table[]
+model Competition {
+  id          Int           @id @default(autoincrement())
+  name        String?
+  association String?
+  year        String?
+  Player      Player[]
+  Skillrating Skillrating[]
+  Teammatch   Teammatch[]
 }
 
-model competition_table {
-  id                Int                 @id @default(autoincrement())
-  name              String?
-  association       String?
-  year              DateTime?
-  skillrating_table skillrating_table[]
-  teammatch_table   teammatch_table[]
+model Doublesmatch {
+  id                                       Int        @id @default(autoincrement())
+  team_match                               Int?
+  home_player1                             Int?
+  home_player2                             Int?
+  away_player1                             Int?
+  away_player2                             Int?
+  result                                   String?
+  match_number                             Int?
+  Player_Doublesmatch_away_player2ToPlayer Player?    @relation("Doublesmatch_away_player2ToPlayer", fields: [away_player2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Player_Doublesmatch_away_player1ToPlayer Player?    @relation("Doublesmatch_away_player1ToPlayer", fields: [away_player1], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Player_Doublesmatch_home_player2ToPlayer Player?    @relation("Doublesmatch_home_player2ToPlayer", fields: [home_player2], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Player_Doublesmatch_home_player1ToPlayer Player?    @relation("Doublesmatch_home_player1ToPlayer", fields: [home_player1], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Teammatch                                Teammatch? @relation(fields: [team_match], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model doublesmatch_table {
-  id                                                         Int              @id @default(autoincrement())
-  team_match                                                 Int?
-  home_player1                                               Int?
-  home_player2                                               Int?
-  away_player1                                               Int?
-  away_player2                                               Int?
-  result                                                     String?
-  match_number                                               Int?
-  player_table_doublesmatch_table_away_player2Toplayer_table player_table?    @relation("doublesmatch_table_away_player2Toplayer_table", fields: [away_player2], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  player_table_doublesmatch_table_away_player1Toplayer_table player_table?    @relation("doublesmatch_table_away_player1Toplayer_table", fields: [away_player1], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  player_table_doublesmatch_table_home_player2Toplayer_table player_table?    @relation("doublesmatch_table_home_player2Toplayer_table", fields: [home_player2], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  player_table_doublesmatch_table_home_player1Toplayer_table player_table?    @relation("doublesmatch_table_home_player1Toplayer_table", fields: [home_player1], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teammatch_table                                            teammatch_table? @relation(fields: [team_match], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Human {
+  id     String   @id
+  name   String?
+  Player Player[]
 }
 
-model human_table {
-  id           String         @id
-  name         String?
-  player_table player_table[]
+model Player {
+  id                                             Int            @id @unique(map: "sqlite_autoindex_Player_1") @default(autoincrement())
+  human                                          String?
+  club                                           Int?
+  association_id                                 String?
+  default_competition                            Int?
+  Doublesmatch_Doublesmatch_away_player2ToPlayer Doublesmatch[] @relation("Doublesmatch_away_player2ToPlayer")
+  Doublesmatch_Doublesmatch_away_player1ToPlayer Doublesmatch[] @relation("Doublesmatch_away_player1ToPlayer")
+  Doublesmatch_Doublesmatch_home_player2ToPlayer Doublesmatch[] @relation("Doublesmatch_home_player2ToPlayer")
+  Doublesmatch_Doublesmatch_home_player1ToPlayer Doublesmatch[] @relation("Doublesmatch_home_player1ToPlayer")
+  Competition                                    Competition?   @relation(fields: [default_competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Club                                           Club?          @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Human                                          Human?         @relation(fields: [human], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Singlesmatch_Singlesmatch_away_playerToPlayer  Singlesmatch[] @relation("Singlesmatch_away_playerToPlayer")
+  Singlesmatch_Singlesmatch_home_playerToPlayer  Singlesmatch[] @relation("Singlesmatch_home_playerToPlayer")
+  Skillrating                                    Skillrating[]
+
+  @@index([human], map: "ix_Player_human")
 }
 
-model player_table {
-  id                                                               Int                  @id @unique(map: "sqlite_autoindex_player_table_1") @default(autoincrement())
-  human                                                            String?
-  club                                                             Int?
-  association_id                                                   String?
-  doublesmatch_table_doublesmatch_table_away_player2Toplayer_table doublesmatch_table[] @relation("doublesmatch_table_away_player2Toplayer_table")
-  doublesmatch_table_doublesmatch_table_away_player1Toplayer_table doublesmatch_table[] @relation("doublesmatch_table_away_player1Toplayer_table")
-  doublesmatch_table_doublesmatch_table_home_player2Toplayer_table doublesmatch_table[] @relation("doublesmatch_table_home_player2Toplayer_table")
-  doublesmatch_table_doublesmatch_table_home_player1Toplayer_table doublesmatch_table[] @relation("doublesmatch_table_home_player1Toplayer_table")
-  club_table                                                       club_table?          @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  human_table                                                      human_table?         @relation(fields: [human], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  singlesmatch_table_singlesmatch_table_away_playerToplayer_table  singlesmatch_table[] @relation("singlesmatch_table_away_playerToplayer_table")
-  singlesmatch_table_singlesmatch_table_home_playerToplayer_table  singlesmatch_table[] @relation("singlesmatch_table_home_playerToplayer_table")
-  skillrating_table                                                skillrating_table[]
+model Singlesmatch {
+  id                                      Int        @id @default(autoincrement())
+  team_match                              Int?
+  home_player                             Int?
+  away_player                             Int?
+  result                                  String?
+  match_number                            Int?
+  Player_Singlesmatch_away_playerToPlayer Player?    @relation("Singlesmatch_away_playerToPlayer", fields: [away_player], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Player_Singlesmatch_home_playerToPlayer Player?    @relation("Singlesmatch_home_playerToPlayer", fields: [home_player], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Teammatch                               Teammatch? @relation(fields: [team_match], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model singlesmatch_table {
-  id                                                        Int              @id @default(autoincrement())
-  team_match                                                Int?
-  home_player                                               Int?
-  away_player                                               Int?
-  result                                                    String?
-  match_number                                              Int?
-  player_table_singlesmatch_table_away_playerToplayer_table player_table?    @relation("singlesmatch_table_away_playerToplayer_table", fields: [away_player], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  player_table_singlesmatch_table_home_playerToplayer_table player_table?    @relation("singlesmatch_table_home_playerToplayer_table", fields: [home_player], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teammatch_table                                           teammatch_table? @relation(fields: [team_match], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Skillrating {
+  id            Int          @id @default(autoincrement())
+  player        Int?
+  competition   Int?
+  rating_mu     Float?
+  rating_sigma  Float?
+  latest_update String?
+  Competition   Competition? @relation(fields: [competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Player        Player?      @relation(fields: [player], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
-model skillrating_table {
-  id                Int                @id @default(autoincrement())
-  player            Int?
-  competition       Int?
-  rating_mu         Float?
-  rating_sigma      Float?
-  latest_update     DateTime?
-  competition_table competition_table? @relation(fields: [competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  player_table      player_table?      @relation(fields: [player], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Team {
+  id                                  Int         @id @default(autoincrement())
+  rank                                String?
+  club                                Int?
+  year                                String?
+  Club                                Club?       @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Teammatch_Teammatch_away_teamToTeam Teammatch[] @relation("Teammatch_away_teamToTeam")
+  Teammatch_Teammatch_home_teamToTeam Teammatch[] @relation("Teammatch_home_teamToTeam")
 }
 
-model team_table {
-  id                                                    Int               @id @default(autoincrement())
-  rank                                                  String?
-  club                                                  Int?
-  year                                                  DateTime?
-  club_table                                            club_table?       @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  teammatch_table_teammatch_table_away_teamToteam_table teammatch_table[] @relation("teammatch_table_away_teamToteam_table")
-  teammatch_table_teammatch_table_home_teamToteam_table teammatch_table[] @relation("teammatch_table_home_teamToteam_table")
-}
-
-model teammatch_table {
-  id                                               Int                  @id @default(autoincrement())
-  date                                             DateTime?
-  competition                                      Int?
-  result                                           String?
-  home_team                                        Int?
-  away_team                                        Int?
-  used_for_rating                                  Boolean?
-  doublesmatch_table                               doublesmatch_table[]
-  singlesmatch_table                               singlesmatch_table[]
-  team_table_teammatch_table_away_teamToteam_table team_table?          @relation("teammatch_table_away_teamToteam_table", fields: [away_team], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  team_table_teammatch_table_home_teamToteam_table team_table?          @relation("teammatch_table_home_teamToteam_table", fields: [home_team], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  competition_table                                competition_table?   @relation(fields: [competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model Teammatch {
+  id                             Int            @id @default(autoincrement())
+  date                           String?
+  competition                    Int?
+  result                         String?
+  home_team                      Int?
+  away_team                      Int?
+  used_for_rating                Boolean?
+  Doublesmatch                   Doublesmatch[]
+  Singlesmatch                   Singlesmatch[]
+  Team_Teammatch_away_teamToTeam Team?          @relation("Teammatch_away_teamToTeam", fields: [away_team], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team_Teammatch_home_teamToTeam Team?          @relation("Teammatch_home_teamToTeam", fields: [home_team], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Competition                    Competition?   @relation(fields: [competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
