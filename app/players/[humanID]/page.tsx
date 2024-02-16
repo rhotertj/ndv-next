@@ -1,5 +1,8 @@
-import { fetchPlayerRatings, PlayerRating, fetchHumanLastSingles, SinglesMatch } from "@/app/lib/player";
-import { RatingCard } from "@/app/ui/player";
+import { PlayerRating } from "@/types/player";
+import { fetchPlayerRatings, fetchHumanLastSingles, fetchHumanLastDoubles } from '@/lib/player';
+import { SinglesMatch, DoublesMatch } from "@/types/match";
+import { RatingCard } from "@/components/player";
+import { DoubleMatchEntry, SingleMatchEntry } from "@/components/match";
 
 export default async function Player({
     params,
@@ -12,8 +15,13 @@ export default async function Player({
     const skillRatingsQuery = await fetchPlayerRatings(humanID);
     const skillRatings = skillRatingsQuery.map((result) => new PlayerRating(result))
     const singlesQueryResult = await fetchHumanLastSingles(humanID);
-    console.log(singlesQueryResult)
     const singles = singlesQueryResult.map((result) => {return new SinglesMatch(result)})
+
+    const doublesQueryResult = await fetchHumanLastDoubles(humanID);
+    const doubles = doublesQueryResult.map((result) => {return new DoublesMatch(result)})
+
+    const playerName = skillRatings[0].playerName
+
     // fetch all player identities
     // for these player identites, find last games, ratings
     return(
@@ -33,7 +41,7 @@ export default async function Player({
             </div> */}
             <div className="flex flex-col">
                 {/* DOES NOT WORK IF PLAYER HAS NO SKILL RATING */}
-                <p className="text-4xl mb-6">{skillRatings[0].playerName}</p>
+                <p className="text-4xl mb-6">{playerName}</p>
                 {/* badges here */}
             </div>
             
@@ -46,7 +54,10 @@ export default async function Player({
 
         <h2 className="text-2xl font-bold mt-6">Letzte Spiele</h2>
             <div>
-                {singles.map( (match : SinglesMatch) =>  <div>{match.homePlayer} {match.result} {match.awayPlayer}</div>)}
+                {singles.map( (match : SinglesMatch) => <SingleMatchEntry single={match} playerName={playerName}/>)}
+            </div>
+            <div>
+                {doubles.map( (match : DoublesMatch) => <DoubleMatchEntry double={match} playerName={playerName}/>)}
             </div>
         </div>
         </div>

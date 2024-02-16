@@ -1,19 +1,19 @@
 /* trunk-ignore-all(prettier) */
-import { Footer } from "./ui/footer";
-import { PlayerListEntry } from "./ui/player";
-import { Filter } from "./ui/filter";
-import { Search } from "./ui/search";
-import { GeneralStats } from "./ui/stats";
+import { Footer } from "../components/footer";
+import { PlayerListEntry } from "../components/player";
+import { Filter } from "../components/filter";
+import { Search } from "../components/search";
+import { GeneralStats } from "../components/stats";
 import { Suspense } from "react";
 import {
   fetchClubFilterOptions,
   fetchCompetitionFilterOptions,
   fetchPlayerRatingsList,
   fetchSeasonFilterOptions,
-  validatedQueryParams,
-} from "./lib/query";
-import { PlayerRating } from "./lib/player";
-import "./index.css";
+} from "@/lib/query";
+import { validatedQueryParams } from '@/types/query';
+import { PlayerRating } from "@/types/player";
+import "@/styles/index.css";
 
 export default async function Home({
   searchParams,
@@ -26,11 +26,13 @@ export default async function Home({
   };
 }) {
   const validatedParams = new validatedQueryParams(searchParams);
-  const competitionOptions =
-    await fetchCompetitionFilterOptions(validatedParams);
-  const seasonOptions = await fetchSeasonFilterOptions(validatedParams);
-  console.log(seasonOptions)
+  const competitionOptions = await fetchCompetitionFilterOptions(validatedParams);
+
+  let seasonOptions: any = await fetchSeasonFilterOptions(validatedParams);
+  seasonOptions = seasonOptions.map( (option: any) => {return {id: option.year, name: new Date(option.year).getFullYear()}})
+
   const clubOptions = await fetchClubFilterOptions(validatedParams);
+
   let players : any = await fetchPlayerRatingsList(validatedParams);
   players = players.map((player : any) => {return new PlayerRating(player)});
 

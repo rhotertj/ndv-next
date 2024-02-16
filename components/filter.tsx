@@ -31,14 +31,15 @@ export async function Filter({
       </div>
       <select
         onInput={(e: any) => {
+          console.log(e)
           updateParams(category, e.target.value, currentSearchParams);
         }}
         defaultValue={currentSearchParams?.get(category)?.toString()}
         className="select select-bordered w-full max-w-xs select-sm rounded-lg"
       >
-        <option value={undefined}>Alle</option>
-        {options.map(({ id, name }: { id: number; name: string }) => (
-          <option key={name} value={name}>
+        <option key="defaultOption" value={undefined}>Alle</option>
+        {options.map(({ id, name }: { id: any; name: string }) => (
+          <option key={id} value={name}>
             {name}
           </option>
         ))}

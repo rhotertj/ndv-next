@@ -1,74 +1,42 @@
-import prisma from "./database";
+import prisma from "@/lib/database";
+import { validatedQueryParams} from "@/types/query";
 
-export class validatedQueryParams {
-  _competition: string;
-  _season: number;
-  _club: string;
-  _name: string;
-
-  constructor(searchParams: any) {
-    this._competition = searchParams?.Wettbewerb;
-    this._season = searchParams?.Saison;
-    this._name = searchParams?.Name;
-    this._club = searchParams?.Verein;
+function seasonYearToDatabaseFormat(year: any) {
+  if (year === undefined) {
+    return undefined
   }
-
-  get name() {
-    if (this._name === null) {
-      return undefined;
-    }
-    return this._name;
-  }
-
-  get competition() {
-    if (this._competition === null) {
-      return undefined;
-    }
-    return this._competition;
-  }
-
-  get club() {
-    if (this._club === null) {
-      return undefined;
-    }
-    return this._club;
-  }
-
-  get season() {
-    if (this._season === null) {
-      return undefined;
-    }
-    return this._season;
-  }
+  return new Date(`${year}-08-01`).toISOString().substring(0, 19)
 }
 
-// where: { year: { equals: new Date(`${filters.season}-08-01`)} },
 export async function fetchCompetitionFilterOptions(
   params: validatedQueryParams,
 ) {
   const competitions = await prisma.competition.findMany({
     select: { name: true },
     where: {
+      year: {
+        equals: seasonYearToDatabaseFormat(params.season)
+      },
       Teammatch: {
         some: {
           OR: [
             {
               Team_Teammatch_away_teamToTeam: {
                 Club: {
-                  name: params.club
-                }
+                  name: params.club,
+                },
               },
             },
             {
               Team_Teammatch_home_teamToTeam: {
                 Club: {
-                  name: params.club
-                }
+                  name: params.club,
+                },
               },
-            }
-          ]
-        }
-      }
+            },
+          ],
+        },
+      },
     },
     orderBy: { name: "asc" },
   });
@@ -85,21 +53,23 @@ export async function fetchClubFilterOptions(params: validatedQueryParams) {
               Teammatch_Teammatch_away_teamToTeam: {
                 some: {
                   Competition: {
-                    name:  params.competition
-                  }
-                }
+                    name: params.competition,
+                    year: seasonYearToDatabaseFormat(params.season)
+                  },
+                },
               },
             },
             {
               Teammatch_Teammatch_home_teamToTeam: {
                 some: {
                   Competition: {
-                    name:  params.competition
-                  }
-                }
+                    name: params.competition,
+                    year: seasonYearToDatabaseFormat(params.season)
+                  },
+                },
               },
-            }
-          ]
+            },
+          ],
         },
       },
     },
@@ -109,12 +79,21 @@ export async function fetchClubFilterOptions(params: validatedQueryParams) {
 }
 
 export async function fetchSeasonFilterOptions(params: validatedQueryParams) {
-  const seasons = await prisma.competition.findMany({select: {year : true}});
+  const seasons = await prisma.competition.findMany({
+    select: { year: true },
+    distinct: ["year"],
+    where: {
+      name: params.competition,
+      Player: {
+        some: {
+          Club: {
+            name: params.club
+          }
+        }
+      }
+    }
+  });
   return seasons;
-  return [
-    { id: 0, name: 2022 },
-    { id: 1, name: 2023 },
-  ];
 }
 
 export async function fetchPlayerRatingsList(params: validatedQueryParams) {
@@ -123,18 +102,19 @@ export async function fetchPlayerRatingsList(params: validatedQueryParams) {
       Player: {
         Human: {
           name: {
-            startsWith: params.name
-          }
+            startsWith: params.name,
+          },
         },
         Club: {
-          name: params.club
-        }
+          name: params.club,
+        },
       },
       Competition: {
-        name: params.competition
-      }
+        name: params.competition,
+        year: seasonYearToDatabaseFormat(params.season)
+      },
     },
-    orderBy: {rating_mu: 'desc'},
+    orderBy: { rating_mu: "desc" },
     select: {
       rating_mu: true,
       rating_sigma: true,
@@ -153,7 +133,7 @@ export async function fetchPlayerRatingsList(params: validatedQueryParams) {
           Human: {
             select: {
               name: true,
-              id: true
+              id: true,
             },
           },
         },
