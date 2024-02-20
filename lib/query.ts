@@ -13,31 +13,20 @@ export async function fetchCompetitionFilterOptions(
 ) {
   const competitions = await prisma.competition.findMany({
     select: { name: true },
+    distinct: ['name'],
     where: {
       year: {
         equals: seasonYearToDatabaseFormat(params.season)
       },
-      Teammatch: {
+      Team: {
         some: {
-          OR: [
-            {
-              Team_Teammatch_away_teamToTeam: {
-                Club: {
-                  name: params.club,
-                },
+            rank: params.rank,
+            Club: {
+              name: params.club,
               },
             },
-            {
-              Team_Teammatch_home_teamToTeam: {
-                Club: {
-                  name: params.club,
-                },
-              },
-            },
-          ],
-        },
+          },
       },
-    },
     orderBy: { name: "asc" },
   });
   return competitions;
@@ -48,34 +37,60 @@ export async function fetchClubFilterOptions(params: validatedQueryParams) {
     where: {
       Team: {
         some: {
-          OR: [
-            {
-              Teammatch_Teammatch_away_teamToTeam: {
-                some: {
-                  Competition: {
-                    name: params.competition,
-                    year: seasonYearToDatabaseFormat(params.season)
-                  },
-                },
-              },
-            },
-            {
-              Teammatch_Teammatch_home_teamToTeam: {
-                some: {
-                  Competition: {
-                    name: params.competition,
-                    year: seasonYearToDatabaseFormat(params.season)
-                  },
-                },
-              },
-            },
-          ],
+          rank: params.rank,
+          year: seasonYearToDatabaseFormat(params.season),
+          Competition: {
+            name: params.competition
+          }
         },
       },
     },
     orderBy: { name: "asc" },
+    distinct: ['name'],
+    select: { 
+       name: true,
+        Team: {
+          select: {
+            rank: true
+          }
+    }}
   });
   return clubs;
+}
+// todo include rank options in other filters
+export async function fetchRankFilterOptions(params: validatedQueryParams) {
+  const ranks = await prisma.team.findMany({
+    where: {
+        Club: {
+          name: params.club
+        },
+        OR: [
+          {
+            Teammatch_Teammatch_away_teamToTeam: {
+              some: {
+                Competition: {
+                  name: params.competition,
+                  year: seasonYearToDatabaseFormat(params.season)
+                },
+              },
+            },
+          },
+          {
+            Teammatch_Teammatch_home_teamToTeam: {
+              some: {
+                Competition: {
+                  name: params.competition,
+                  year: seasonYearToDatabaseFormat(params.season)
+                },
+              },
+            },
+          },
+        ],
+    },
+    orderBy: { rank: "asc" },
+    distinct: ['rank']
+  });
+  return ranks;
 }
 
 export async function fetchSeasonFilterOptions(params: validatedQueryParams) {
@@ -84,10 +99,15 @@ export async function fetchSeasonFilterOptions(params: validatedQueryParams) {
     distinct: ["year"],
     where: {
       name: params.competition,
-      Player: {
+      Team: {
         some: {
           Club: {
-            name: params.club
+            name: params.club,
+            Team: {
+              some: {
+                rank: params.rank
+              }
+            }
           }
         }
       }
@@ -106,21 +126,27 @@ export async function fetchPlayerRatingsList(params: validatedQueryParams) {
           },
         },
         Club: {
-          name: params.club,
+          name: params.club
         },
       },
-      Competition: {
-        name: params.competition,
-        year: seasonYearToDatabaseFormat(params.season)
+      Team: {
+        Competition: {name: params.competition},
+        rank: params.rank,
+        year: seasonYearToDatabaseFormat(params.season),
       },
     },
     orderBy: { rating_mu: "desc" },
     select: {
       rating_mu: true,
       rating_sigma: true,
-      Competition: {
+      Team: {
         select: {
-          name: true,
+          Competition: {
+            select: {
+              name: true,
+              year: true
+            },
+          }
         },
       },
       Player: {

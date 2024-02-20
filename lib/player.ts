@@ -8,17 +8,21 @@ export async function fetchPlayerRatings(humanID: string) {
       },
     },
     orderBy: {
-      Competition: {
+      Team: {
         year: 'desc'
       }
     },
     select: {
       rating_mu: true,
       rating_sigma: true,
-      Competition: {
+      Team: {
         select: {
-          name: true,
-          year: true
+          Competition: {
+            select: {
+              name: true,
+              year: true
+            }
+          }
         },
       },
       Player: {
@@ -70,6 +74,11 @@ export async function fetchHumanLastSingles(humanID: string) {
         }
       }
     },
+    // orderBy: {
+    //   Teammatch: {
+    //     date: ["desc"]
+    //   }
+    // },
     where: {
         OR: [
           {

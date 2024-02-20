@@ -15,12 +15,11 @@ model Club {
 }
 
 model Competition {
-  id          Int           @id @default(autoincrement())
+  id          Int         @id @default(autoincrement())
   name        String?
   association String?
   year        String?
-  Player      Player[]
-  Skillrating Skillrating[]
+  Team        Team[]
   Teammatch   Teammatch[]
 }
 
@@ -51,12 +50,12 @@ model Player {
   human                                          String?
   club                                           Int?
   association_id                                 String?
-  default_competition                            Int?
+  team                                           Int?
   Doublesmatch_Doublesmatch_away_player2ToPlayer Doublesmatch[] @relation("Doublesmatch_away_player2ToPlayer")
   Doublesmatch_Doublesmatch_away_player1ToPlayer Doublesmatch[] @relation("Doublesmatch_away_player1ToPlayer")
   Doublesmatch_Doublesmatch_home_player2ToPlayer Doublesmatch[] @relation("Doublesmatch_home_player2ToPlayer")
   Doublesmatch_Doublesmatch_home_player1ToPlayer Doublesmatch[] @relation("Doublesmatch_home_player1ToPlayer")
-  Competition                                    Competition?   @relation(fields: [default_competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team                                           Team?          @relation(fields: [team], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Club                                           Club?          @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Human                                          Human?         @relation(fields: [human], references: [id], onDelete: NoAction, onUpdate: NoAction)
   Singlesmatch_Singlesmatch_away_playerToPlayer  Singlesmatch[] @relation("Singlesmatch_away_playerToPlayer")
@@ -79,24 +78,28 @@ model Singlesmatch {
 }
 
 model Skillrating {
-  id            Int          @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   player        Int?
-  competition   Int?
+  team          Int?
   rating_mu     Float?
   rating_sigma  Float?
   latest_update String?
-  Competition   Competition? @relation(fields: [competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Player        Player?      @relation(fields: [player], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Team          Team?   @relation(fields: [team], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Player        Player? @relation(fields: [player], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model Team {
-  id                                  Int         @id @default(autoincrement())
+  id                                  Int           @id @default(autoincrement())
   rank                                String?
   club                                Int?
   year                                String?
-  Club                                Club?       @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  Teammatch_Teammatch_away_teamToTeam Teammatch[] @relation("Teammatch_away_teamToTeam")
-  Teammatch_Teammatch_home_teamToTeam Teammatch[] @relation("Teammatch_home_teamToTeam")
+  competition                         Int?
+  Player                              Player[]
+  Skillrating                         Skillrating[]
+  Competition                         Competition?  @relation(fields: [competition], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Club                                Club?         @relation(fields: [club], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  Teammatch_Teammatch_away_teamToTeam Teammatch[]   @relation("Teammatch_away_teamToTeam")
+  Teammatch_Teammatch_home_teamToTeam Teammatch[]   @relation("Teammatch_home_teamToTeam")
 }
 
 model Teammatch {

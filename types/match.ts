@@ -1,3 +1,19 @@
+
+function getLocaleDateString(date: Date){
+  let formatter = new Intl.DateTimeFormat(
+    "de-de",
+    {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit"
+    }
+  )
+  return formatter.format(date)
+  
+}
+
 export class SinglesMatch {
     readonly homePlayer: string;
     readonly awayPlayer: string;
@@ -11,6 +27,12 @@ export class SinglesMatch {
       this.result = match.result;
       this.date = new Date(match.Teammatch.date);
     }
+
+    
+    public getDateString() {
+      return getLocaleDateString(this.date)
+    }
+    
   }
   
   export class DoublesMatch {
@@ -29,5 +51,9 @@ export class SinglesMatch {
       this.awayPlayer2 = match.Player_Doublesmatch_away_player2ToPlayer.Human.name;
       this.result = match.result;
       this.date = new Date(match.Teammatch.date);
+    }
+
+    public getDateString() {
+      return getLocaleDateString(this.date)
     }
   }

@@ -10,6 +10,7 @@ import {
   fetchCompetitionFilterOptions,
   fetchPlayerRatingsList,
   fetchSeasonFilterOptions,
+  fetchRankFilterOptions
 } from "@/lib/query";
 import { validatedQueryParams } from '@/types/query';
 import { PlayerRating } from "@/types/player";
@@ -32,6 +33,8 @@ export default async function Home({
   seasonOptions = seasonOptions.map( (option: any) => {return {id: option.year, name: new Date(option.year).getFullYear()}})
 
   const clubOptions = await fetchClubFilterOptions(validatedParams);
+  let rankOptions : any = await fetchRankFilterOptions(validatedParams);
+  rankOptions = rankOptions.map( (option: any) => {return {id: option.id, name: option.rank}})
 
   let players : any = await fetchPlayerRatingsList(validatedParams);
   players = players.map((player : any) => {return new PlayerRating(player)});
@@ -50,6 +53,7 @@ export default async function Home({
           <Filter category="Wettbewerb" options={competitionOptions} />
           <Filter category="Saison" options={seasonOptions} />
           <Filter category="Verein" options={clubOptions} />
+          <Filter category="Team" options={rankOptions} />
         </div>
       </div>
       <div className="min-w-fit flex flex-col items-center">

@@ -39,7 +39,7 @@ export async function Filter({
       >
         <option key="defaultOption" value={undefined}>Alle</option>
         {options.map(({ id, name }: { id: any; name: string }) => (
-          <option key={id} value={name}>
+          <option key={name} value={name}>
             {name}
           </option>
         ))}

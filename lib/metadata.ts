@@ -1,4 +1,4 @@
-import prisma from "./database";
+import prisma from "@/lib/database";
 
 export type metaDataType = {
     players: number;
@@ -7,7 +7,7 @@ export type metaDataType = {
   };
   
   export async function fetchMetaData() {
-    const nPlayers = await prisma.player.count();
+    const nPlayers = await prisma.human.count();
     const nSingles = await prisma.singlesmatch.count();
     const nDoubles = await prisma.doublesmatch.count();
     const nCompetitions = await prisma.competition.count();

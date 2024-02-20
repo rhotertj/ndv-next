@@ -41,8 +41,8 @@ CREATE TABLE "Player" (
     "human" TEXT,
     "club" INTEGER,
     "association_id" TEXT,
-    "default_competition" INTEGER,
-    CONSTRAINT "Player_default_competition_fkey" FOREIGN KEY ("default_competition") REFERENCES "Competition" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    "team" INTEGER,
+    CONSTRAINT "Player_team_fkey" FOREIGN KEY ("team") REFERENCES "Team" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT "Player_club_fkey" FOREIGN KEY ("club") REFERENCES "Club" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT "Player_human_fkey" FOREIGN KEY ("human") REFERENCES "Human" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
@@ -64,11 +64,11 @@ CREATE TABLE "Singlesmatch" (
 CREATE TABLE "Skillrating" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "player" INTEGER,
-    "competition" INTEGER,
+    "team" INTEGER,
     "rating_mu" REAL,
     "rating_sigma" REAL,
     "latest_update" TEXT,
-    CONSTRAINT "Skillrating_competition_fkey" FOREIGN KEY ("competition") REFERENCES "Competition" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
+    CONSTRAINT "Skillrating_team_fkey" FOREIGN KEY ("team") REFERENCES "Team" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT "Skillrating_player_fkey" FOREIGN KEY ("player") REFERENCES "Player" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 
@@ -78,6 +78,8 @@ CREATE TABLE "Team" (
     "rank" TEXT,
     "club" INTEGER,
     "year" TEXT,
+    "competition" INTEGER,
+    CONSTRAINT "Team_competition_fkey" FOREIGN KEY ("competition") REFERENCES "Competition" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION,
     CONSTRAINT "Team_club_fkey" FOREIGN KEY ("club") REFERENCES "Club" ("id") ON DELETE NO ACTION ON UPDATE NO ACTION
 );
 

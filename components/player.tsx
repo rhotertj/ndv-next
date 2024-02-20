@@ -8,9 +8,9 @@ export function PlayerListEntry({
   index: number;
   player: PlayerRating;
 }) {
-
+  // target="_blank"
   return (
-    <Link key={`${player.humanID}-${player.competitionName}-${player.ratingMu}`} href={`/players/${player.humanID}`} target="_blank">
+    <Link key={`${player.humanID}-${player.competitionName}-${player.ratingMu}`} href={`/players/${player.humanID}`} >
       <div className="flex player-container border border-solid rounded-md mb-1 min-w-fit lg:min-w-[650px] max-w-screen-lg">
         <div className="player-indicator w-2"></div>
         <div className="flex-col self-center my-2 mx-4">{index + 1}.</div>
@@ -47,12 +47,22 @@ export function PlayerListEntry({
 
 export function RatingCard({rating}: {rating: PlayerRating}){
   return (
-    <div className="card max-w-fit border-primary border-dotted shadow-xl mx-4">
+    <div className="card max-w-96 border-primary border-dotted shadow-xl">
       <div className="card-body">
-          <h2 className="card-title text-3xl flex justify-center">{rating.ratingMu.toFixed(2)}</h2>
-          <p className="mx-4">{rating.competitionName}, {rating.clubName}</p>
+            <h2 className="card-title text-3xl flex justify-center">{rating.ratingMu.toFixed(2)}</h2>
+          <div className="flex gap-x-2.5 mx-4 flex-wrap">
+            <p>{rating.competitionName}</p><p>{rating.clubName}</p>
+          </div>
           <p className="flex justify-center font-bold">{rating.year}</p>
       </div>
+    </div>
+  )
+}
+
+export function PlayerDetailView({humanID}: {humanID: string}){
+  return (
+    <div>
+        {humanID}
     </div>
   )
 }
