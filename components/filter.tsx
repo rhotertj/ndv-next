@@ -2,7 +2,7 @@
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 
-export async function Filter({
+export function Filter({
   category,
   options,
 }: {

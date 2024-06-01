@@ -1,7 +1,7 @@
 "use client";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
-export async function Search({ category }: { category: string }) {
+export function Search({ category }: { category: string }) {
   const searchParamsParser: any = useSearchParams();
   const currentSearchParams = new URLSearchParams(searchParamsParser);
 

@@ -17,12 +17,12 @@ export default async function Player({
     const skillRatings = skillRatingsQuery.map((result) => new PlayerRating(result))
     const singlesQueryResult = await fetchHumanLastSingles(humanID);
     const singles = singlesQueryResult.map((result) => {return new SinglesMatch(result)})
-    let sortedSingles = singles.sort((a : SinglesMatch, b: SinglesMatch) => { return b.date - a.date})
+    let sortedSingles = singles.sort((a : SinglesMatch, b: SinglesMatch) => { return b.date.getTime() - a.date.getTime()})
     
 
     const doublesQueryResult = await fetchHumanLastDoubles(humanID);
     const doubles = doublesQueryResult.map((result) => {return new DoublesMatch(result)})
-    let sortedDoubles = doubles.sort((a : DoublesMatch, b: DoublesMatch) => { return b.date - a.date})
+    let sortedDoubles = doubles.sort((a : DoublesMatch, b: DoublesMatch) => { return b.date.getTime() - a.date.getTime()})
 
     const playerName = skillRatings[0].playerName
 
