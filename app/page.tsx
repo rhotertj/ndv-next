@@ -1,5 +1,6 @@
 /* trunk-ignore-all(prettier) */
 import { Footer } from "../components/footer";
+import { Header } from "@/components/header";
 import { PlayerListEntry } from "../components/player";
 import { Filter } from "../components/filter";
 import { Search } from "../components/search";
@@ -42,6 +43,7 @@ export default async function Home({
   players.sort((a: PlayerRating, b: PlayerRating) => b.conservativeRating() - a.conservativeRating());
   return (
     <main>
+      <Header />
       <div>
         <h1 className="flex justify-center mt-[150px] text-4xl lg:text-9xl font-bold antialiased">
           <span className="italic font-black">NDV</span>Rankings

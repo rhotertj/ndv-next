@@ -1,0 +1,67 @@
+# FAQ
+
+## Warum gibt es diese Seite?
+Aktuell kann man die Stärke der Spielerinnen einer Liga nur anhand der Spielertabelle abschätzen.
+Diese basiert auf der Anzahl der gewonnen und verlorenen Spiele. Jemand, der von 5 Spielen alle gewonnen hat,
+steht vermutlich weit oben und jemand der alle verloren hat findet sich auf den letzten Plätzen.
+Das Problem ist allerdings, dass nicht jeder gegen jeden spielt, sondern dass man nur gegen einen kleinen Teil der Liga spielt.
+Die Varianz der Fähigkeiten innerhalb der Liga ist im Amateursport aber sehr groß.
+So ist es möglich, dass der letzte Platz gegen die besten 5 der Liga verloren hat,
+und der erste Platz gegen die schlechtesten 5 gewonnen hat. Das ergibt natürlich ein verzerrtes Bild und die Bilanz
+in der Spielertabelle ist somit wenig aussagekräftig.  
+
+
+Viel sinnvoller ist es, die Siege unterschiedlich zu bewerten - nämlich abhängig von dem erwarteten Ausgang der Partie. 
+Nehmen wir an, ich lerne am Board jemanden neues kennen. Wenn ich sie noch nie habe spielen sehen und keine
+weiteren Informationen habe, gehe ich vielleicht von einer durchschnittlichen Spielerin aus.
+Das entspricht einem Average von 40-50 Punkten pro Aufnahme. Bekomme ich aber vorher die Information,
+das sie gestern das gesamte A-Team meines Vereins geschlagen hat, ohne ein Leg abzugeben,
+stelle ich mich wohl auf einen deutlich bessere Gegnerin ein. Hätte sie nicht das A Team besiegt, sondern das D-Team,
+müsste ich mir vermutlich keine so großen Sorgen machen.  
+
+
+Für die Einschätzung der Fähigkeiten eines Spielers ist also nicht die Anzahl ihrer Siege und Niederlagen entscheidend,
+sondern die Stärke des jeweiligen Gegners.  
+
+## Wie wird die Spielstärke berechnet?
+Die Spielstärke bzw. der Skill wird mithilfe einer Zahl zwischen 0 und 50 ausgedrückt.
+Je höher diese Zahl ist, desto besser spielt die Person Dart. Da die Stärke gewissen Schwankungen unterliegt,
+und die Genauigkeit des Rankings stark von der Anzahl der vorherigen Spielen abhängt,
+wird die Spielstärke als Wahrscheinlichkeit über die Zahlen von 0 bis 50 formuliert.
+Wir sagen also nicht mit vollständiger Sicherheit, dass jemand die Stärke 34 besitzt, sondern nur,
+dass der Wert sehr wahrscheinlich zwischen 32 und 36 liegt.
+
+Dies geschieht mithilfe einer Normalverteilung, welche mit dem Erwartungswert (μ) und der Standardabweichung (σ) beschrieben wird.
+Der Erwartungswert ist hierbei die Spielstärke, welche wir bei den bisher gespielten Spielen als am wahrscheinlichsten erachten,
+in dem obigen Beispiel die 34. Die Standardabweichung ist ein Maß für die Unsicherheit unserer Schätzung.
+Da wir mit einer Normalverteilung modellieren, gehen wir davon aus, dass unsere Schätzung mit der gleichen Wahrscheinlichkeit
+zu gut oder zu schlecht sein kein (zwischen 32 und 36). 
+
+Zu Beginn einer Saison starten alle mit einem Erwartungswert von μ = 25 und einer Standardabweichung von σ = 25 / 3.
+Somit liegen alle erwartbaren Fähigkeitslevel innerhalb von μ ± 3σ.
+Wir gehen also bei allen von einem durchschnittlichen Niveau aus und einem großen Fehlerbalken in beide Richtungen.
+
+Um unsere Rankings sukzessive zu verbessern, können wir sie nach jedem Spiel (wir können es auch als "Messung" sehen) neu berechnen.
+Gewinnt jemand mit einem sehr hohen Ranking (großer Erwartungswert) gegen jemand anderen mit einem hohen Ranking,
+so war das Ranking des Verlierers vielleicht etwas zu gut und das des Siegers etwas zu niedrig. 
+
+Gewinnt jemand mit einem sehr schlechten Ranking auf einmal gegen jemanden mit einem sehr hohen Ranking,
+so müssen wir diese wahrscheinlich etwas rabiater korrigieren. Wir haben den Verlierer womöglich viel zu gut eingeschätzt
+und der Sieger hat vielleicht in der Vergangenheit underperformt. 
+
+Die genauen Formeln und wie die Anpassung von der verschiedenen Parametern abhängt,
+könnt ihr in [hier](https://www.microsoft.com/en-us/research/project/trueskill-ranking-system/overview/) nachlesen.
+
+Je mehr Spiele gespielt werden, desto kleiner wird die Standardabweichung und desto präziser werden unsere Rankings.
+Folglich sind die Schätzungen in den ersten Spieltagen weniger belastbar als am Saisonende.
+
+Bitte bedenkt: Die Rankings und die darauf basierenden Siegwahrscheinlichkeiten sind nur Erwartungen basierend auf den früheren Ereignissen.
+Sie sind keine genaue Zukunftsvorhersage!
+
+## Warum hat xyz ein besseres Ranking als ich, obwohl ich gegen ihn gewonnen habe?
+Der direkte Vergleich ist bei der Berechnung egal. Es zählen nur die Rankings zum Zeitpunkt der jeweiligen Spiele.
+Hast du jemanden mit höherem Ranking besiegt, hat er/sie sich in der Vergangenheit vermutlich besser angestellt als du.
+
+## Ich habe alles gewonnen, warum bin ich nicht erste der Liga?
+Dein Ranking ist abhängig von den Rankings deiner Gegner.
+Vermutlich hast du - vom Ranking her gesehen - nicht so starke Gegner gehabt wie die aktuell erste.

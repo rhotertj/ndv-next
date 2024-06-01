@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import "@/styles/globals.css";
+import "./globals.css";
 
-const montserrat = Montserrat({subsets: ['latin']});
+const montserrat = Montserrat({subsets: ['latin'],  display: 'swap'});
 
 export const metadata: Metadata = {
   title: "NDV Rankings",
