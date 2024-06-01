@@ -122,7 +122,7 @@ export async function fetchPlayerRatingsList(params: validatedQueryParams) {
       Player: {
         Human: {
           name: {
-            startsWith: params.name,
+            contains: params.name,
           },
         },
         Club: {
