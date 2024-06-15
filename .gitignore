@@ -37,4 +37,5 @@ next-env.d.ts
 
 # sqlite
 *.db
+!*/empty.db
 *.db-journal
