@@ -1,6 +1,6 @@
 "use client;"
 import {PlayerRating} from '@/types/player';
-import * as d3 from "d3";
+// import * as d3 from "d3";
 
 export async function Heatmap({
   homePlayers,

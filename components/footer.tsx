@@ -1,7 +1,8 @@
 import { fetchLastUpdate } from "../lib/metadata";
 
 export async function Footer() {
-    const lastUpdate : string = await fetchLastUpdate();
+    // Todo: Put fetch in page file, just do cosmetics here
+    const lastUpdate : any = await fetchLastUpdate();
     console.log(`last update ${lastUpdate}`)
     return (
         <div>
